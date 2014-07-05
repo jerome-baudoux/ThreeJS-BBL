@@ -7,7 +7,7 @@ Small introduction to ThreeJS
 ===============
 License
 ===============
-Free Translator by Jérôme Baudoux is licensed under a 
+This BBL is licensed under a 
 Creative Commons Attribution-Noncommercial-Share Alike 3.0 Unported License.
 
 ===============
