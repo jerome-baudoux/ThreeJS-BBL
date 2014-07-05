@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>WebGL</title>
+		<meta charset="utf-8">
+		<style>
+			* {
+				border: 0;
+				margin: 0;
+				padding: 0;
+				overflow: hidden;
+			}
+		</style>
+		<script src="libs/three.min.js"></script>
+
+		<script>
+			function webGLStart() {
+			
+				var width = 300;
+				var height = 200;
+				var camera, scene, renderer, mesh;
+
+				/**
+				 * Executed once
+				 */
+				function init() {
+
+					// ThreeJS Context
+					renderer = new THREE.WebGLRenderer({
+						canvas: document.getElementById('canvas'), 
+						antialias:true
+					});
+					renderer.setSize(width, height);
+					renderer.setClearColor(0xffffff, 1);
+
+					// Camera
+					camera = new THREE.PerspectiveCamera( 70, width/height, 1, 5000 );
+					camera.position = new THREE.Vector3( 0, 300, 500 );
+					camera.lookAt(new THREE.Vector3( 0, 0, 0 ));
+					
+					// Object
+					var geometry = new THREE.BoxGeometry( 200, 200, 200 );
+					var material = new THREE.MeshBasicMaterial( { color: '#000', wireframe :true } );
+					mesh = new THREE.Mesh( geometry, material );
+
+					// Scene
+					scene = new THREE.Scene();
+					scene.add( mesh );
+				}
+
+				/**
+				 * Executed every frame
+				 */
+				function animate() {
+					// Schedule next frame
+					requestAnimationFrame( animate );
+					
+					// Draw frame
+					renderer.render( scene, camera );
+				}
+
+				init();
+				animate();
+			};
+		</script>
+	</head>
+	<body onload="webGLStart();">
+		<center><canvas id="canvas" style="border: 1px solid black;" width="300" height="200"></canvas></center>
+	</body>
+</html>

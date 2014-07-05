@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>WebGL</title>
+        <meta charset="utf-8">
+        <style>
+            * {
+                border: 0;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+        </style>
+        <script src="libs/three.min.js"></script>
+        <script src="libs/THREEx.KeyboardState.js"></script>
+
+        <script>
+            function webGLStart() {
+            
+                var width = 300;
+                var height = 200;
+                var camera, scene, renderer, mesh1, ambiant, point, dir;
+                var keyboard = new THREEx.KeyboardState();
+
+                /**
+                 * Executed once
+                 */
+                function init() {
+
+                    //
+                    // ThreeJS Context
+                    //
+                    renderer = new THREE.WebGLRenderer({
+                        canvas: document.getElementById('canvas'), 
+                        antialias:true
+                    });
+                    renderer.setSize(width, height);
+                    renderer.setClearColor(0xffffff, 1);
+
+                    //
+                    // Camera
+                    //
+                    camera = new THREE.PerspectiveCamera(70, width/height, 1, 5000);
+                    camera.position = new THREE.Vector3(0, 300, 600);
+                    camera.lookAt(new THREE.Vector3(0, 0, 0));
+                    
+                    //
+                    // Objects
+                    //
+                    
+                    // Object 1
+                    var geometry1 = new THREE.SphereGeometry( 300, 32, 32 );
+                    var texture = THREE.ImageUtils.loadTexture('imgs/ball.jpg');
+                    var material1 = new THREE.MeshPhongMaterial( { ambient: 0x333333, color: 0x999999, specular: 0x555555, shininess: 0, shading: THREE.SmoothShading, map: texture }  ) ;
+                    mesh1 = new THREE.Mesh(geometry1, material1);
+                    
+                    // Ambiant Light 
+                    ambiant = new THREE.AmbientLight(0x0000ff);
+                    
+                    // Point light towards the cube (red)
+                    point = new THREE.PointLight( 0xff0000, 1, 1000 );
+                    point.position.set( 400, 0, 000 );
+                    
+                    // Directional light (yellow)
+                    dir = new THREE.DirectionalLight(0xffff55);
+                    dir.position.set(-400, 400, 0);
+
+                    //
+                    // Scene
+                    //
+                    scene = new THREE.Scene();
+                    scene.add(camera);
+                    scene.add(mesh1);
+                    scene.add(ambiant);
+                    scene.add(point);
+                    scene.add(dir);
+                }
+
+                /**
+                 * Executed every frame
+                 */
+                function animate() {
+                    // Schedule next frame
+                    requestAnimationFrame( animate );
+                    
+                    updates();
+                    
+                    // Draw frame
+                    renderer.render( scene, camera );
+                }
+                
+                function updates() {
+                    
+                    // Updates object
+                    mesh1.rotation.y+=.01;
+                    
+                    // Updates light
+                    var time = Date.now() * -0.002;
+                    point.position.x = Math.sin( time ) * 400;
+                    point.position.z = Math.cos( time ) * 400;
+                
+                    // Press A enable specular
+                    if(keyboard.pressed('A')) {
+                        mesh1.material.shininess = 60;
+                    }
+                    
+                    // Press Z disable specular                    
+                    if(keyboard.pressed('Z')) {
+                        mesh1.material.shininess = 0;
+                    }
+                }
+
+                init();
+                animate();
+            };
+        </script>
+    </head>
+    <body onload="webGLStart();">
+        <center><canvas id="canvas" style="border: 1px solid black;" width="300" height="200"></canvas></center>
+    </body>
+</html>

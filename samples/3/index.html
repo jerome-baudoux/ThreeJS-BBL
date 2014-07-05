@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>WebGL</title>
+		<meta charset="utf-8">
+		<style>
+			* {
+				border: 0;
+				margin: 0;
+				padding: 0;
+				overflow: hidden;
+			}
+		</style>
+		<script src="libs/three.min.js"></script>
+		<script src="libs/THREEx.KeyboardState.js"></script>
+
+		<script>
+			function webGLStart() {
+			
+				var width = 300;
+				var height = 200;
+				var camera, scene, renderer, mesh1, mesh2;
+				var keyboard = new THREEx.KeyboardState();
+
+				/**
+				 * Executed once
+				 */
+				function init() {
+
+					//
+					// ThreeJS Context
+					//
+					renderer = new THREE.WebGLRenderer({
+						canvas: document.getElementById('canvas'), 
+						antialias:true
+					});
+					renderer.setSize(width, height);
+					renderer.setClearColor(0xffffff, 1);
+
+					//
+					// Camera
+					//
+					camera = new THREE.PerspectiveCamera( 70, width/height, 1, 5000 );
+					camera.position = new THREE.Vector3( 0, 300, 600 );
+					camera.lookAt(new THREE.Vector3( 0, 0, 0 ));
+					
+					//
+					// Objects
+					//
+					
+					// General
+					var geometry = new THREE.BoxGeometry( 200, 200, 200 );
+					var material = new THREE.MeshBasicMaterial( { color: '#000', wireframe :true } );
+					
+					// Object 1
+					mesh1 = new THREE.Mesh( geometry, material );
+					
+					// Object 2
+					mesh2 = new THREE.Mesh( geometry, material );
+					mesh2.position.x = 200;
+
+					//
+					// Scene
+					//
+					scene = new THREE.Scene();
+					scene.add(camera);
+					scene.add(mesh1);
+					mesh1.add(mesh2);
+				}
+
+				/**
+				 * Executed every frame
+				 */
+				function animate() {
+					// Schedule next frame
+					requestAnimationFrame( animate );
+					
+					// Handle updates
+					updates();
+					
+					// Draw frame
+					renderer.render( scene, camera );
+				}
+				
+				function updates() {
+				
+					// Press R mesh1 and mesh2 will rotate
+					// Since mesh2 is attached to mesh1
+					if(keyboard.pressed('A')) {
+						mesh1.rotation.y += 0.05;
+					}
+					
+					// Press S and only mesh2 will rotate
+					if(keyboard.pressed('Z')) {
+						mesh2.rotation.y += 0.05;
+					}
+				}
+
+				init();
+				animate();
+			};
+		</script>
+	</head>
+	<body onload="webGLStart();">
+		<center><canvas id="canvas" style="border: 1px solid black;" width="300" height="200"></canvas></center>
+	</body>
+</html>

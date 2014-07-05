@@ -1,0 +1,867 @@
+﻿<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+
+        <title>WebGL/ThreeJS</title>
+
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <link rel="stylesheet" href="css/reveal.min.css">
+        <link rel="stylesheet" href="css/theme/sky.css" id="theme">
+
+        <!-- For syntax highlighting -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+
+        <!--[if lt IE 9]>
+        <script src="lib/js/html5shiv.js"></script>
+        <![endif]-->
+    </head>
+
+    <body>
+
+        <div class="reveal">
+
+            <!-- Any section element inside of this container is displayed as a slide -->
+            <div class="slides">
+                <section>
+                    <h1>WebGL</h1>
+                    <h3>A l'aide de ThreeJS</h3>
+                    <p>
+                        Jérôme Baudoux
+                    </p>
+                </section>
+
+                <section>
+                    <h2>Sommaire</h2>
+                    <ul>
+                        <li>Qu'est-ce que la synthèse d'image 3D ?</li>
+                        <li>Pourquoi WebGL ?</li>
+                        <li>Pourquoi Three JS ?</li>
+                        <li>Un peu de pratique</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h4>Qu'est-ce que la synthèse d'image 3D ?</h4>
+                    <ul>
+                        <li>Représentation de l’environnement</li>
+                        <li>Transformation de cet environnement en image 2D</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h4>Représentation de l’environnement</h4>
+                    <p>Voxels Vs Triangles</p>
+                    <p>
+                        <img src="images/04.png" />
+                    </p>
+                </section>
+
+                <section>
+                    <h4>Représentation de l’environnement</h4>
+                    <img src="images/05.png" />
+                    <ul>
+                        <li>Définition de formes géométriques à l’aide de triangles.</li>
+                        <li>Utilisation de couleurs / textures</li>
+                        <li>Utilisation de lumières</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h4>Transformation de cet environnement en image 2D</h4>
+                    <ul>
+                        <li>Un observateur</li>
+                        <li>Une direction</li>
+                        <li>Un champ de vision</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h4>Transformation de cet environnement en image 2D</h4>
+                    <p>
+                        <img src="images/03.png" />
+                    </p>
+                </section>
+                
+                <section>
+                    <h4>Pourquoi WebGL ?</h4>
+                    <ul>
+                        <li>Demande de générer plusieurs dizaines d’images par seconde</li>
+                        <p>
+                            <ul>
+                                <li>Pour 25 FPS</li>
+                                <ul><li>On dispose de 40ms pour générer chaque image</li></ul>
+                                <li>Pour 60 FPS</li>
+                                <ul><li>On dispose de 17ms pour générer chaque image</li></ul>
+                            </ul>
+                        </p>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h4>Pourquoi WebGL ?</h4>
+                    <ul>
+                        <li>Calcul répétitifs et très couteux pour le CPU (Modèle TCL)</li>
+                        <ul>
+                            <br>
+                            <li>Pour chaque sommet (Transformation)</li>
+                            <ul>
+                                <li>Calcul sa position sur l’écran</li>
+                            </ul>
+                            <br>
+                            <li>Pour chaque triangle (Clipping)</li>
+                            <ul>
+                                <li>Eviction des triangles non visibles sur l'écran</li>
+                            </ul>
+                            <br>
+                            <li>Pour chaque pixel de chaque triangle (Lighting)</li>
+                            <font size=3>(Une image HD représente plus de 2,000,000 de pixels)</font>
+                            <ul>
+                                <li>Interpolation linéaire des propriétés des sommets</li>
+                                <li>Calcul de la couleur du pixel</li>
+                            </ul>
+                        </ul>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h4>Pourquoi WebGL ?</h4>
+                    <p>
+                        Les opérations sur un sommet sont <strong>indépendantes</strong> des autres sommets
+                    </p>
+                    <p>
+                        Les opérations sur un pixel sont <strong>dépendantes</strong> de ses sommets mais <strong>indépendantes</strong> des autres pixels
+                    </p>
+                    <br>
+                    <p>
+                        Répétitif + Pas de dépendances = parallélisable
+                    </p>
+                </section>
+                
+                <section>
+                    <h4>Pourquoi WebGL ?</h4>
+                    <p>
+                        Paralléliser ? ... où ? ... sur plusieurs threads ?
+                    </p>
+                    <br>
+                    <p>
+                        ... Pas assez Parallélisé ! 
+                    </p>
+                </section>
+                
+                <section>
+                    <h4>Pourquoi WebGL ?</h4>
+                    <p>
+                        Sur le GPU !
+                    </p>
+                        <img src="images/06.png" />
+                </section>
+                
+                <section>
+                    <h4>Pourquoi WebGL ?</h4>
+                    <p>
+                        WebGL (basé sur OpenGL ES) est une API bas niveau capable d’interagir avec la carte graphique pour déporter le calcul du CPU vers le GPU.
+                    </p>
+                </section>
+                
+                <section>
+                    <h4>Pourquoi Three JS ?</h4>
+                    <p>
+                        WebGL est trop bas niveau !
+                    </p>
+                    <iframe src="samples/1/index.html" width="800" height="600"></iframe>
+                </section>
+                
+                <section>
+                    <h4>Pourquoi Three JS ?</h4>
+                    <p>
+                        WebGL est trop bas niveau !
+                    </p>
+                    <pre><code data-trim>
+<html>
+    <head>
+        <title>WebGL</title>
+        <meta charset="utf-8">
+        <style>
+            * {
+                border: 0;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+        </style>
+        
+        <!-- External libs -->
+        <script type="text/javascript" src="libs/glMatrix-0.9.5.min.js"></script>
+        <script type="text/javascript" src="libs/webgl-utils.js"></script>
+        
+        <!-- our code -->
+        <script id="shader-fs" type="x-shader/x-fragment">
+            precision mediump float;
+            varying vec2 vTextureCoord;
+            uniform sampler2D uSampler;
+            void main(void) {
+                gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+            }
+        </script>
+        <script id="shader-vs" type="x-shader/x-vertex">
+            attribute vec3 aVertexPosition;
+            attribute vec2 aTextureCoord;
+            uniform mat4 uMVMatrix;
+            uniform mat4 uPMatrix;
+            varying vec2 vTextureCoord;
+            void main(void) {
+                gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+                vTextureCoord = aTextureCoord;
+            }
+        </script>
+        <script type="text/javascript">
+            var gl;
+            
+            function initGL(canvas) {
+                gl = WebGLUtils.setupWebGL(canvas);
+                gl.viewportWidth = canvas.width;
+                gl.viewportHeight = canvas.height;
+            }
+
+            function getShader(gl, id) {
+                var shaderScript = document.getElementById(id);
+                if (!shaderScript) {
+                    return null;
+                }
+
+                var str = "";
+                var k = shaderScript.firstChild;
+                while (k) {
+                    if (k.nodeType == 3) {
+                        str += k.textContent;
+                    }
+                    k = k.nextSibling;
+                }
+
+                var shader;
+                if (shaderScript.type == "x-shader/x-fragment") {
+                    shader = gl.createShader(gl.FRAGMENT_SHADER);
+                } else if (shaderScript.type == "x-shader/x-vertex") {
+                    shader = gl.createShader(gl.VERTEX_SHADER);
+                } else {
+                    return null;
+                }
+
+                gl.shaderSource(shader, str);
+                gl.compileShader(shader);
+
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    alert(gl.getShaderInfoLog(shader));
+                    return null;
+                }
+
+                return shader;
+            }
+
+            var shaderProgram;
+
+            function initShaders() {
+                var fragmentShader = getShader(gl, "shader-fs");
+                var vertexShader = getShader(gl, "shader-vs");
+
+                shaderProgram = gl.createProgram();
+                gl.attachShader(shaderProgram, vertexShader);
+                gl.attachShader(shaderProgram, fragmentShader);
+                gl.linkProgram(shaderProgram);
+
+                if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+                    alert("Could not initialise shaders");
+                }
+
+                gl.useProgram(shaderProgram);
+
+                shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+                gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+
+                shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
+                gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
+
+                shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
+                shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
+                shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
+            }
+
+            var texture;
+
+            function initTexture() {
+                texture = gl.createTexture();
+                texture.image = new Image();
+                texture.image.onload = function () {
+                    gl.bindTexture(gl.TEXTURE_2D, texture);
+                    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                    gl.bindTexture(gl.TEXTURE_2D, null);
+                }
+                texture.image.src = "imgs/uv.jpg";
+            }
+
+            var mvMatrix = mat4.create();
+            var pMatrix = mat4.create();
+
+            function setMatrixUniforms() {
+                gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
+                gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+            }
+
+            var squareVertexPositionBuffer;
+            var squareVertexTextureCoordBuffer;
+
+            function initBuffers() {
+                squareVertexPositionBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
+                var vertices = [
+                     1.0,  1.0,  0.0,
+                    -1.0,  1.0,  0.0,
+                     1.0, -1.0,  0.0,
+                    -1.0, -1.0,  0.0
+                ];
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+                squareVertexPositionBuffer.itemSize = 3;
+                squareVertexPositionBuffer.numItems = 4;
+                
+                squareVertexTextureCoordBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexTextureCoordBuffer);
+                var textureCoords = [
+                  1.0, 1.0,
+                  0.0, 1.0,
+                  1.0, 0.0,
+                  0.0, 0.0
+                ];
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
+                squareVertexTextureCoordBuffer.itemSize = 2;
+                squareVertexTextureCoordBuffer.numItems = 4;
+            }
+
+
+            function drawScene() {
+                gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+                mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
+                mat4.identity(mvMatrix);
+                mat4.translate(mvMatrix, [0.0, 0.0, -7.0]);
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
+                gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+                
+                gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexTextureCoordBuffer);
+                gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, squareVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+                gl.uniform1i(shaderProgram.samplerUniform, 0);
+                
+                setMatrixUniforms();
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
+            }
+
+            function tick() {
+                requestAnimFrame(tick);
+                drawScene();
+            }
+
+            function webGLStart() {
+                var canvas = document.getElementById("canvas");
+                initGL(canvas);
+                initShaders();
+                initBuffers();
+                initTexture();
+
+                gl.clearColor(1.0, 1.0, 1.0, 1.0);
+                gl.enable(gl.DEPTH_TEST);
+
+                tick();
+            }
+        </script>
+    </head>
+    <body onload="webGLStart();">
+        <center><canvas id="canvas" style="border: 1px solid black;" width="300" height="200"></canvas></center>
+    </body>
+</html>
+                    </code></pre>
+                </section>
+                
+                <section>
+                    <h4>Un peu de pratique</h4>
+                    <ul>
+                        <li>Les bases</li>
+                        <li>Les transformations</li>
+                        <li>Les matériaux</li>
+                        <li>L'éclairage</li>
+                        <li>Les shaders</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h4>Un peu de pratique</h4>
+                    <p>
+                        Les bases
+                    </p>
+                    <iframe src="samples/2/index.html" width="800" height="600"></iframe>
+                </section>
+
+                <section>
+                    <h4>Un peu de pratique</h4>
+                    <p>
+                        Les bases
+                    </p>
+                    <pre><code data-trim>
+var width = 300;
+var height = 200;
+var camera, scene, renderer;
+
+/**
+ * Executed once
+ */
+function init() {
+
+    // ThreeJS Context
+    renderer = new THREE.WebGLRenderer({
+        canvas: document.getElementById('canvas'), 
+        antialias:true
+    });
+    renderer.setSize(width, height);
+    renderer.setClearColor(0xffffff, 1);
+
+    // Camera
+    camera = new THREE.PerspectiveCamera(70, width/height, 1, 5000);
+    camera.position = new THREE.Vector3(0, 300, 500);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+    
+    // Object
+    var geometry = new THREE.BoxGeometry(200, 200, 200);
+    var material = new THREE.MeshBasicMaterial({
+        color: '#000', 
+        wireframe: true
+    });
+    var mesh = new THREE.Mesh(geometry, material);
+
+    // Scene
+    scene = new THREE.Scene();
+    scene.add(camera);
+    scene.add(mesh);
+}
+
+/**
+ * Executed every frame
+ */
+function animate() {
+    // Schedule next frame
+    requestAnimationFrame(animate);
+    
+    // Draw frame
+    renderer.render(scene, camera);
+}
+
+init();
+animate();
+                    </code></pre>
+                </section>
+                
+                <section>
+                    <h4>Un peu de pratique</h4>
+                    <p>
+                        Les transformations
+                    </p>
+                    <pre><code data-trim>
+var width = 300;
+var height = 200;
+var camera, scene, renderer, mesh1, mesh2;
+var keyboard = new THREEx.KeyboardState();
+
+/**
+ * Executed once
+ */
+function init() {
+
+    //
+    // ThreeJS Context
+    //
+    renderer = new THREE.WebGLRenderer({
+        canvas: document.getElementById('canvas'), 
+        antialias:true
+    });
+    renderer.setSize(width, height);
+    renderer.setClearColor(0xffffff, 1);
+
+    //
+    // Camera
+    //
+    camera = new THREE.PerspectiveCamera(70, width/height, 1, 5000);
+    camera.position = new THREE.Vector3(0, 300, 600);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+    
+    //
+    // Objects
+    //
+    
+    // General
+    var geometry = new THREE.BoxGeometry(200, 200, 200);
+    var material = new THREE.MeshBasicMaterial({ 
+        color: '#000', 
+        wireframe: true 
+    });
+    
+    // Object 1
+    mesh1 = new THREE.Mesh(geometry, material);
+    
+    // Object 2
+    mesh2 = new THREE.Mesh(geometry, material);
+    mesh2.position.x = 200;
+
+    //
+    // Scene
+    //
+    scene = new THREE.Scene();
+    scene.add(camera);
+    scene.add(mesh1);
+    mesh1.add(mesh2);
+}
+
+/**
+ * Executed every frame
+ */
+function animate() {
+    // Schedule next frame
+    requestAnimationFrame(animate;
+    
+    // Handle updates
+    updates();
+    
+    // Draw frame
+    renderer.render(scene, camera);
+}
+
+function updates() {
+
+    // Press R mesh1 will rotate
+    if(keyboard.pressed('A')) {
+        mesh1.rotation.y += 0.05;
+    }
+    
+    // Press S mesh2 will rotate
+    if(keyboard.pressed('Z')) {
+        mesh2.rotation.y += 0.05;
+    }
+}
+
+init();
+animate();
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h4>Un peu de pratique</h4>
+                    <p>
+                        Les transformations
+                    </p>
+                    <iframe src="samples/3/index.html" width="800" height="600"></iframe>
+                </section>
+
+                <section>
+                    <h4>Un peu de pratique</h4>
+                    <p>
+                        Les materiaux
+                    </p>
+                    <ul>
+                        <li>MeshBasicMaterial</li>
+                        <li>MeshFaceMaterial</li>
+                        <li>MeshPhongMaterial</li>
+                        <li>ShaderMaterial</li>
+                    </ul>
+                    <p>
+                        <iframe src="samples/4/index.html" width="800" height="600"></iframe>
+                    </p>
+                </section>
+                
+                <section>
+                    <h4>Un peu de pratique</h4>
+                    <p>
+                        Les materiaux
+                    </p>
+                    <pre><code data-trim>
+var width = 300;
+var height = 200;
+var camera, scene, renderer, mesh1, mesh2;
+
+/**
+ * Executed once
+ */
+function init() {
+
+    //
+    // ThreeJS Context
+    //
+    renderer = new THREE.WebGLRenderer({
+        canvas: document.getElementById('canvas'), 
+        antialias:true
+    });
+    renderer.setSize(width, height);
+    renderer.setClearColor(0xffffff, 1);
+
+    //
+    // Camera
+    //
+    camera = new THREE.PerspectiveCamera(70, width/height, 1, 5000);
+    camera.position = new THREE.Vector3(0, 300, 600);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+    
+    //
+    // Objects
+    //
+    
+    // Object 1
+    var geometry1 = new THREE.BoxGeometry( 200, 200, 200 );
+    var texture = THREE.ImageUtils.loadTexture('imgs/uv.jpg');
+    var material1 = new THREE.MeshBasicMaterial({color: '#fff', map: texture});
+    mesh1 = new THREE.Mesh(geometry1, material1);
+    mesh1.position.x = -200;
+    
+    // Object 2
+    var geometry2 = new THREE.BoxGeometry( 200, 200, 200 );
+    var material2 = new THREE.MeshFaceMaterial([
+        new THREE.MeshBasicMaterial({color: '#f00'}),
+        new THREE.MeshBasicMaterial({color: '#0f0'}),
+        new THREE.MeshBasicMaterial({color: '#00f'}),
+        new THREE.MeshBasicMaterial({color: '#ff0'}),
+        new THREE.MeshBasicMaterial({color: '#0ff'}),
+        new THREE.MeshBasicMaterial({color: '#f0f'})
+    ]);
+    mesh2 = new THREE.Mesh(geometry2, material2);
+    mesh2.position.x = 200;
+
+    //
+    // Scene
+    //
+    scene = new THREE.Scene();
+    scene.add(camera);
+    scene.add(mesh1);
+    scene.add(mesh2);
+}
+
+/**
+ * Executed every frame
+ */
+function animate() {
+    // Schedule next frame
+    requestAnimationFrame( animate );
+    
+    // Updates objects
+    mesh1.rotation.y+=.01;
+    mesh2.rotation.y+=.01;
+    
+    // Draw frame
+    renderer.render( scene, camera );
+}
+
+init();
+animate();
+                    </code></pre>
+                </section>
+                
+               <section>
+                    <h4>Un peu de pratique</h4>
+                    <p>
+                        L'éclairage (avec MeshPhongMaterial)
+                    </p>
+                    
+                    <p>Types de lumières :</p>
+                    
+                    <ul>
+                        <li>AmbientLight</li>
+                        <li>DirectionalLight</li>
+                        <li>SpotLight</li>
+                        <li>PointLight</li>
+                    </ul>
+
+                </section>
+                
+                <section>
+                    <h4>Un peu de pratique</h4>
+                    <p>
+                        L'éclairage (avec MeshPhongMaterial)
+                    </p>
+                    
+                    <p>Paramètres pour le MeshPhongMaterial :</p>
+
+                    <ul>
+                        <li>Ambient</li>
+                        <li>Color</li>
+                        <li>Specular</li>
+                        <li>Shininess</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h4>Un peu de pratique</h4>
+                    <p>
+                        L'éclairage
+                    </p>
+                    <pre><code data-trim>
+var width = 300;
+var height = 200;
+var camera, scene, renderer, mesh1, ambiant, point, dir;
+var keyboard = new THREEx.KeyboardState();
+
+/**
+ * Executed once
+ */
+function init() {
+
+    //
+    // ThreeJS Context
+    //
+    renderer = new THREE.WebGLRenderer({
+        canvas: document.getElementById('canvas'), 
+        antialias:true
+    });
+    renderer.setSize(width, height);
+    renderer.setClearColor(0xffffff, 1);
+
+    //
+    // Camera
+    //
+    camera = new THREE.PerspectiveCamera(70, width/height, 1, 5000);
+    camera.position = new THREE.Vector3(0, 300, 600);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+    
+    //
+    // Objects
+    //
+    
+    // Object 1
+    var geometry1 = new THREE.SphereGeometry( 300, 32, 32 );
+    var texture = THREE.ImageUtils.loadTexture('imgs/ball.jpg');
+    var material1 = new THREE.MeshPhongMaterial( { ambient: 0x333333, color: 0x999999, specular: 0x555555, shininess: 0, shading: THREE.SmoothShading, map: texture }  ) ;
+    mesh1 = new THREE.Mesh(geometry1, material1);
+    
+    // Ambiant Light (blue)
+    ambiant = new THREE.AmbientLight(0x0000ff);
+    
+    // Directional light (yellow)
+    dir = new THREE.DirectionalLight(0xffff55);
+    dir.position.set(-400, 400, 0);
+    
+    // Moving point light towards the sphere (red)
+    point = new THREE.PointLight( 0xff0000, 1, 1000 );
+    point.position.set( 400, 0, 000 );
+    
+    //
+    // Scene
+    //
+    scene = new THREE.Scene();
+    scene.add(camera);
+    scene.add(mesh1);
+    scene.add(ambiant);
+    scene.add(point);
+    scene.add(dir);
+}
+
+/**
+ * Executed every frame
+ */
+function animate() {
+    // Schedule next frame
+    requestAnimationFrame( animate );
+    
+    updates();
+    
+    // Draw frame
+    renderer.render( scene, camera );
+}
+
+function updates() {
+    
+    // Updates object
+    mesh1.rotation.y+=.01;
+    
+    // Updates light
+    var time = Date.now() * -0.002;
+    point.position.x = Math.sin( time ) * 400;
+    point.position.z = Math.cos( time ) * 400;
+
+    // Press A enable specular
+    if(keyboard.pressed('A')) {
+        mesh1.material.shininess = 60;
+    }
+    
+    // Press Z disable specular                    
+    if(keyboard.pressed('Z')) {
+        mesh1.material.shininess = 0;
+    }
+}
+
+init();
+animate();
+                    </code></pre>
+                </section>
+                
+                <section>
+                    <h4>Un peu de pratique</h4>
+                    <p>
+                        L'éclairage
+                    </p>
+                    <iframe src="samples/5/index.html" width="800" height="600"></iframe>
+                </section>
+
+                <section>
+                    <p>Slides mades with: </p>
+                    <h2>Reveal.js</h2>
+                    <p>
+                        <small>Created by <a href="http://hakim.se">Hakim El Hattab</a> / <a href="http://twitter.com/hakimel">@hakimel</a></small>
+                    </p>
+                </section>
+
+            </div>
+
+        </div>
+
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.min.js"></script>
+
+        <script>
+
+            // Full list of configuration options available here:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                history: true,
+                center: true,
+                slideNumber: true,
+
+                theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+                transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+                // Parallax scrolling
+                // parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+                // parallaxBackgroundSize: '2100px 900px',
+
+                // Optional libraries used to extend on reveal.js
+                dependencies: [
+                    { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                    { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+                    { src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+                    { src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+                ]
+            });
+
+        </script>
+
+    </body>
+</html>

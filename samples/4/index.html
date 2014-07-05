@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>WebGL</title>
+        <meta charset="utf-8">
+        <style>
+            * {
+                border: 0;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+        </style>
+        <script src="libs/three.min.js"></script>
+        <script src="libs/THREEx.KeyboardState.js"></script>
+
+        <script>
+            function webGLStart() {
+            
+                var width = 300;
+                var height = 200;
+                var camera, scene, renderer, mesh1, mesh2;
+
+                /**
+                 * Executed once
+                 */
+                function init() {
+
+                    //
+                    // ThreeJS Context
+                    //
+                    renderer = new THREE.WebGLRenderer({
+                        canvas: document.getElementById('canvas'), 
+                        antialias:true
+                    });
+                    renderer.setSize(width, height);
+                    renderer.setClearColor(0xffffff, 1);
+
+                    //
+                    // Camera
+                    //
+                    camera = new THREE.PerspectiveCamera(70, width/height, 1, 5000);
+                    camera.position = new THREE.Vector3(0, 300, 600);
+                    camera.lookAt(new THREE.Vector3(0, 0, 0));
+                    
+                    //
+                    // Objects
+                    //
+                    
+                    // Object 1
+                    var geometry1 = new THREE.BoxGeometry( 200, 200, 200 );
+                    var texture = THREE.ImageUtils.loadTexture('imgs/uv.jpg');
+                    var material1 = new THREE.MeshBasicMaterial({color: '#fff', map: texture});
+                    mesh1 = new THREE.Mesh(geometry1, material1);
+                    mesh1.position.x = -200;
+                    
+                    // Object 2
+                    var geometry2 = new THREE.BoxGeometry( 200, 200, 200 );
+                    var material2 = new THREE.MeshFaceMaterial([
+                        new THREE.MeshBasicMaterial({color: '#f00'}),
+                        new THREE.MeshBasicMaterial({color: '#0f0'}),
+                        new THREE.MeshBasicMaterial({color: '#00f'}),
+                        new THREE.MeshBasicMaterial({color: '#ff0'}),
+                        new THREE.MeshBasicMaterial({color: '#0ff'}),
+                        new THREE.MeshBasicMaterial({color: '#f0f'})
+                    ]);
+                    mesh2 = new THREE.Mesh(geometry2, material2);
+                    mesh2.position.x = 200;
+
+                    //
+                    // Scene
+                    //
+                    scene = new THREE.Scene();
+                    scene.add(camera);
+                    scene.add(mesh1);
+                    scene.add(mesh2);
+                }
+
+                /**
+                 * Executed every frame
+                 */
+                function animate() {
+                    // Schedule next frame
+                    requestAnimationFrame( animate );
+                    
+                    // Updates objects
+                    mesh1.rotation.y+=.01;
+                    mesh2.rotation.y+=.01;
+                    
+                    // Draw frame
+                    renderer.render( scene, camera );
+                }
+
+                init();
+                animate();
+            };
+        </script>
+    </head>
+    <body onload="webGLStart();">
+        <center><canvas id="canvas" style="border: 1px solid black;" width="300" height="200"></canvas></center>
+    </body>
+</html>
