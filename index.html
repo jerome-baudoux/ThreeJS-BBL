@@ -816,6 +816,166 @@ animate();
                     </p>
                     <iframe src="samples/5/index.html" width="800" height="600"></iframe>
                 </section>
+                
+                <section>
+                    <h4>Un peu de pratique</h4>
+                    <p>
+                        Les shaders
+                    </p>
+                    
+                    <p>
+						Permet de programmer les tranformations effectuées par la carte graphique
+					</p>
+
+                    <ul>
+                        <li>Vertex Shader:
+							<ul><li>Calcul de la position du sommet</li></ul>
+						</li>
+						<br/>
+                        <li>Pixel (fragment) Shader: 
+							<ul><li>Calcul de la couleur du pixel</li></ul>
+						</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h4>Un peu de pratique</h4>
+                    <p>
+                        Les shaders
+                    </p>
+                    <pre><code data-trim>
+<script id="vertexShader" type="x-shader/x-vertex">
+
+    // To interpolate for the Pixel
+    varying vec2 vUv;
+
+    void main() {
+    
+        // Do nothing fancy here
+        vUv = uv;
+        
+        // Simple projection
+        vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+        gl_Position = projectionMatrix * mvPosition;
+    }
+
+</script>
+
+<script id="pixelShader" type="x-shader/x-fragment">
+
+    // Param
+    uniform float time;
+    uniform sampler2D texture;
+    
+    // Interpolated from Vertex
+    varying vec2 vUv;
+
+    void main( void ) {
+    
+        // Change the texture coordinate depending on the time
+        // The coordinate recieved here are already interpolated
+        vec2 uv;
+        uv.x = vUv.x;
+        uv.y = vUv.y * abs(sin(time));
+
+        // Color of the pixel
+        vec3 color = texture2D(texture, uv).rgb;
+        gl_FragColor = vec4(color , 1.0);
+    }
+
+</script>
+
+<script>
+
+    function webGLStart() {
+    
+        var start = Date.now();
+        var width = 300;
+        var height = 200;
+        var camera, scene, renderer, mesh1, uniforms1;
+
+        /**
+         * Executed once
+         */
+        function init() {
+
+            //
+            // ThreeJS Context
+            //
+            renderer = new THREE.WebGLRenderer({
+                canvas: document.getElementById('canvas'), 
+                antialias:true
+            });
+            renderer.setSize(width, height);
+            renderer.setClearColor(0xffffff, 1);
+
+            //
+            // Camera
+            //
+            camera = new THREE.PerspectiveCamera(70, width/height, 1, 5000);
+            camera.position = new THREE.Vector3(0, 300, 600);
+            camera.lookAt(new THREE.Vector3(0, 0, 0));
+            
+            //
+            // Objects
+            //
+            
+            // Object 1
+            var geometry1 = new THREE.SphereGeometry( 300, 32, 32 );
+            var texture = THREE.ImageUtils.loadTexture('imgs/ball.jpg');
+            
+            // Paramters
+            uniforms1 = {
+                time: { type: "f", value: 1.0 },
+                texture: { type: "t", value: texture }
+            };
+            
+            // Setup of the shader material
+            var material1 = new THREE.ShaderMaterial( {
+                uniforms: uniforms1,
+                vertexShader: document.getElementById( 'vertexShader' ).textContent,
+                fragmentShader: document.getElementById( 'pixelShader' ).textContent
+            });
+            
+            mesh1 = new THREE.Mesh(geometry1, material1);
+
+
+            //
+            // Scene
+            //
+            scene = new THREE.Scene();
+            scene.add(camera);
+            scene.add(mesh1);
+        }
+
+        /**
+         * Executed every frame
+         */
+        function animate() {
+            // Schedule next frame
+            requestAnimationFrame( animate );
+            
+            // Updates time
+            uniforms1.time.value = (Date.now() - start) / 5000;
+            
+            // Draw frame
+            renderer.render( scene, camera );
+        }
+
+        init();
+        animate();
+    };
+</script>
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h4>Un peu de pratique</h4>
+                    <p>
+                        Les shaders
+                    </p>
+                    <iframe src="samples/6/index.html" width="800" height="600"></iframe>
+                </section>
 
                 <section>
                     <p>Slides mades with: </p>
